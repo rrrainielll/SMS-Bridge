@@ -74,7 +74,6 @@ class MainActivity : ComponentActivity() {
                         },
                         onRequestPermissions = ::requestPermissions,
                         onOpenAppSettings = ::openAppSettings,
-                        onOpenBatterySettings = ::openBatterySettings,
                         onToggleForwarding = viewModel::toggleForwarding,
                         onRetry = viewModel::retryNow,
                         onTest = viewModel::testConnection,
@@ -142,9 +141,4 @@ class MainActivity : ComponentActivity() {
         )
     }
 
-    private fun openBatterySettings() {
-        // Opens the system list; needs no extra permission (unlike requesting the exemption directly).
-        val intent = Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
-        if (intent.resolveActivity(packageManager) != null) startActivity(intent) else openAppSettings()
-    }
 }

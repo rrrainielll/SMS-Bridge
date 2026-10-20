@@ -56,7 +56,6 @@ fun MainScreen(
     onIntroContinue: () -> Unit,
     onRequestPermissions: () -> Unit,
     onOpenAppSettings: () -> Unit,
-    onOpenBatterySettings: () -> Unit,
     onToggleForwarding: () -> Unit,
     onRetry: () -> Unit,
     onTest: () -> Unit,
@@ -122,7 +121,7 @@ fun MainScreen(
                     )
                 }
 
-                InfoCard(onOpenBatterySettings)
+                InfoCard()
             }
         }
     }
@@ -367,7 +366,7 @@ private fun SetupStep(done: Boolean, title: String, detail: String, actionLabel:
 // ─────────────────────────────────────────────────────────────────────────────
 
 @Composable
-private fun InfoCard(onOpenBatterySettings: () -> Unit) {
+private fun InfoCard() {
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow),
         modifier = Modifier.fillMaxWidth()
@@ -387,9 +386,7 @@ private fun InfoCard(onOpenBatterySettings: () -> Unit) {
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
-            TextButton(onClick = onOpenBatterySettings) {
-                Text("Battery settings (keep SMSBridge unrestricted)")
-            }
+
         }
     }
 }
