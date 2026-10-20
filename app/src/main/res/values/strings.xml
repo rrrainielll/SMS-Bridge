@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">SMSBridge</string>
+    <string name="channel_issues_name">Delivery problems</string>
+    <string name="channel_issues_desc">Shown when SMSBridge cannot deliver messages to Telegram.</string>
+    <string name="notif_issue_title">SMS forwarding needs attention</string>
+    <string name="notif_issue_text">Messages are waiting to be delivered. Open SMSBridge to check your Telegram settings.</string>
+</resources>

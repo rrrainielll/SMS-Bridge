@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Envelope with an arrow: a message being forwarded. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <group
+        android:scaleX="0.62"
+        android:scaleY="0.62"
+        android:pivotX="54"
+        android:pivotY="54">
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M24,30 L84,30 Q90,30 90,36 L90,72 Q90,78 84,78 L24,78 Q18,78 18,72 L18,36 Q18,30 24,30 Z M28,38 L54,58 L80,38 L80,36 L28,36 Z" />
+        <path
+            android:fillColor="#1E88E5"
+            android:pathData="M26,40 L54,61 L82,40 L82,44 L54,65 L26,44 Z" />
+    </group>
+</vector>

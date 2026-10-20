@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Detect incoming SMS. -->
+    <uses-permission android:name="android.permission.RECEIVE_SMS" />
+    <!-- Samsung One UI requires READ_SMS alongside RECEIVE_SMS for reliable broadcast delivery. -->
+    <uses-permission android:name="android.permission.READ_SMS" />
+    <!-- Send messages to the Telegram Bot API. -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Send an SMS as a fallback when the Telegram bot is unreachable. -->
+    <uses-permission android:name="android.permission.SEND_SMS" />
+    <!-- Detect connectivity so deliveries are retried when the network returns (WorkManager). -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <!-- Re-schedule pending deliveries after a reboot. -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <!-- Show a "delivery problem" notification on Android 13+. -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <!-- Foreground service for the real-time recording file monitor. -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+    <!-- Access audio recordings on external storage (API 32 and below). -->
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
+    <!-- Access audio recordings on external storage (API 33+). -->
+    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
+    <!--
+      Read call log to look up caller number by timestamp when the filename doesn't embed it.
+      This is optional — caller lookup silently falls back to filename-only parsing if denied.
+    -->
+    <uses-permission android:name="android.permission.READ_CALL_LOG" />
+
+    <uses-feature
+        android:name="android.hardware.telephony"
+        android:required="false" />
+
+    <application
+        android:name=".SmsBridgeApp"
+        android:allowBackup="false"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="false"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.SMSBridge"
+        android:usesCleartextTraffic="false"
+        tools:targetApi="36">
+
+        <activity
+            android:name=".ui.MainActivity"
+            android:exported="true"
+            android:windowSoftInputMode="adjustResize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- Only the system may deliver SMS_RECEIVED to this receiver (BROADCAST_SMS). -->
+        <receiver
+            android:name=".receiver.SmsReceiver"
+            android:exported="true"
+            android:permission="android.permission.BROADCAST_SMS">
+            <intent-filter android:priority="999">
+                <action android:name="android.provider.Telephony.SMS_RECEIVED" />
+            </intent-filter>
+        </receiver>
+
+        <receiver
+            android:name=".receiver.BootReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+            </intent-filter>
+        </receiver>
+
+        <!--
+          Foreground service that uses FileObserver to monitor recording directories.
+          specialUse is required on API 34+ for services that don't fit the predefined types.
+        -->
+        <service
+            android:name=".receiver.RecordingMonitorService"
+            android:exported="false"
+            android:foregroundServiceType="specialUse">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="monitorRecordingFolders" />
+        </service>
+
+    </application>
+</manifest>
