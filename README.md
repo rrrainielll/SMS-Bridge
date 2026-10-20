@@ -38,8 +38,9 @@ sweep acts as a safety net. Messages are delivered in arrival order.
 Each Telegram message looks like:
 
 ```
-📩 SMS from +639171234567
-🕒 2026-10-19 22:55:49 UTC+08:00
+<b>💬 SMS From:</b> +639171234567
+<b>🕐 Time:</b> 2026-10-19 22:55:49 UTC+08:00
+────────────
 
 Your verification code is 123456
 ```
@@ -111,26 +112,11 @@ The APK is written to `app/build/outputs/apk/debug/app-debug.apk`.
 
 ## Automated release builds
 
-Every push builds a signed release APK and publishes it to a GitHub Release. Before the first push, add these
-repository Actions secrets under **Settings → Secrets and variables → Actions**:
+Every push builds an unsigned release APK and publishes it as a workflow artifact and on a GitHub Release. No
+signing secrets are required. Android requires APKs to be signed before installation, so sign the downloaded APK
+with your own keystore before installing it.
 
-| Secret | Value |
-| --- | --- |
-| `ANDROID_KEYSTORE_BASE64` | Base64-encoded contents of the release `.jks` keystore |
-| `ANDROID_KEYSTORE_PASSWORD` | Keystore password |
-| `ANDROID_KEY_ALIAS` | Signing key alias |
-| `ANDROID_KEY_PASSWORD` | Signing key password |
-
-Generate a keystore once with `keytool`, then save the `.jks` file and passwords securely:
-
-```sh
-keytool -genkeypair -v -keystore smsbridge-release.jks -keyalg RSA -keysize 2048 -validity 10000 -alias smsbridge
-base64 < smsbridge-release.jks | tr -d '\n'
-```
-
-Put the second command's output in `ANDROID_KEYSTORE_BASE64`. Keep the same keystore for future releases so users
-can install updates over previous versions; never commit it to the repository. If any signing secret is missing,
-the workflow fails rather than publishing an unsigned APK.
+Keep your signing keystore private and use the same key for subsequent app updates.
 
 ## 4. Install on the phone
 

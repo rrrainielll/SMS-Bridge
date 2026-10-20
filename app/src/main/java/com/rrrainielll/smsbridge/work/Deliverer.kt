@@ -251,7 +251,7 @@ object Deliverer {
         val time = formatTime(receivedAt)
         return chunks.mapIndexed { index, chunk ->
             val suffix = if (chunks.size > 1) " (part ${index + 1}/${chunks.size})" else ""
-            "💬 SMS From: $escapedSender$suffix\n🕐 Time: $time\n\n$chunk"
+            "<b>💬 SMS From:</b> $escapedSender$suffix\n<b>🕐 Time:</b> $time\n────────────\n\n$chunk"
         }
     }
 
