@@ -112,11 +112,13 @@ The APK is written to `app/build/outputs/apk/debug/app-debug.apk`.
 
 ## Automated release builds
 
-Every push builds an unsigned release APK and publishes it as a workflow artifact and on a GitHub Release. No
-signing secrets are required. Android requires APKs to be signed before installation, so sign the downloaded APK
-with your own keystore before installing it.
+Every push builds a signed release APK and publishes it as a workflow artifact and on a GitHub Release. The
+workflow uses the `ANDROID_KEYSTORE_BASE64`, `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS`, and
+`ANDROID_KEY_PASSWORD` repository Actions secrets. Keep the keystore private and use the same key for subsequent
+app updates.
 
-Keep your signing keystore private and use the same key for subsequent app updates.
+The release APK can be installed directly on Android. If SMSBridge is already installed, the APK must be signed
+with the same keystore as the installed version to update it without uninstalling.
 
 ## 4. Install on the phone
 
