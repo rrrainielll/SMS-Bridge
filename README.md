@@ -8,6 +8,16 @@ your Android phone's messages (OTPs, bank alerts, normal texts) on an iPhone, or
 - Min Android: 8.0 (API 26) · Target/compile SDK: 36
 - Network: only `api.telegram.org`, over HTTPS. No analytics, no other servers.
 
+## Preview
+
+<div align="center">
+
+| Main | Settings |
+|:---:|:---:|
+| ![SMSBridge Main](https://raw.githubusercontent.com/rrrainielll/SMS-Bridge/refs/heads/main/Preview/249ADD46-90D2-4629-8098-5507428AA54D.jpeg) | ![SMSBridge Settings](https://raw.githubusercontent.com/rrrainielll/SMS-Bridge/refs/heads/main/Preview/58F33765-22E8-4020-85BF-71C92D73DC89_1_201_a.jpeg) |
+
+</div>
+
 ## How it works
 
 ```
@@ -18,10 +28,10 @@ SMS arrives ─▶ SmsReceiver ─▶ encrypted local queue ─▶ Telegram send
 
 1. A manifest-registered `BroadcastReceiver` gets every `SMS_RECEIVED` broadcast, even when the app is closed.
 2. The message (sender, body, SMS timestamp) is written to a local SQLite queue (sender/body encrypted with an
-   Android Keystore key). A unique hash of sender + timestamp + body prevents the same message being queued twice.
+Android Keystore key). A unique hash of sender + timestamp + body prevents the same message being queued twice.
 3. A delivery is attempted immediately. If it fails (offline, Telegram down, rate limit) the message stays in the
-   queue and WorkManager retries with exponential back-off as soon as a network is available. A 15-minute periodic
-   sweep acts as a safety net. Messages are delivered in arrival order.
+queue and WorkManager retries with exponential back-off as soon as a network is available. A 15-minute periodic
+sweep acts as a safety net. Messages are delivered in arrival order.
 4. Once Telegram acknowledges a message, its stored sender and text are erased (only counters remain).
 5. After a reboot or app update, `BootReceiver` re-arms the retry schedule and flushes anything pending.
 
@@ -39,17 +49,17 @@ Messages longer than Telegram's limit are split into numbered parts.
 ### Design notes
 
 - **No persistent foreground service.** Android delivers `SMS_RECEIVED` to manifest receivers of apps that hold
-  `RECEIVE_SMS`, with no foreground service or permanent notification required. Retries use WorkManager, which is
-  Android's supported mechanism for deferrable, guaranteed work. "Service running" in the UI means forwarding is
-  switched on.
+`RECEIVE_SMS`, with no foreground service or permanent notification required. Retries use WorkManager, which is
+Android's supported mechanism for deferrable, guaranteed work. "Service running" in the UI means forwarding is
+switched on.
 - **Notifications** are used only for one alert, "SMS forwarding needs attention" (for example the bot token was
-  revoked). It never contains SMS content.
+revoked). It never contains SMS content.
 - Auto-backup and device-to-device transfer are disabled for the app, so credentials and queued messages never leave the phone.
 
 ## Permissions
 
 | Permission | Why |
-|---|---|
+| --- | --- |
 | `RECEIVE_SMS` | Detect incoming SMS (runtime permission) |
 | `INTERNET` | Talk to the Telegram Bot API |
 | `ACCESS_NETWORK_STATE` | WorkManager retries when connectivity returns |
@@ -68,15 +78,17 @@ The app does **not** read your SMS inbox (`READ_SMS`), send SMS, or access conta
 
 Pick one:
 
+- Use your username add “@” first when entering your username in the app.
 - Message **@userinfobot** (or **@RawDataBot**) in Telegram; it replies with your numeric ID, e.g. `123456789`.
 - Or, after messaging your bot, open
-  `https://api.telegram.org/bot<YOUR_TOKEN>/getUpdates` in a browser and read `message.chat.id`.
+`https://api.telegram.org/bot<YOUR_TOKEN>/getUpdates` in a browser and read `message.chat.id`.
 
 For a group, add the bot to the group, send a message, and read `chat.id` from `getUpdates` (group IDs are
 negative, e.g. `-1001234567890`). A public channel can be given as `@channelname` with the bot added as admin.
 
 > ⚠️ Use a **private chat that only you can read**: it will contain your OTPs and banking messages.
-> Telegram bot chats use client-server encryption, not end-to-end encryption.
+Telegram bot chats use client-server encryption, not end-to-end encryption.
+> 
 
 ## 3. Build the debug APK
 
@@ -99,6 +111,11 @@ The APK is written to `app/build/outputs/apk/debug/app-debug.apk`.
 
 ## 4. Install on the phone
 
+**Manual Installation (Recommended):**
+
+1. Download .apk from the release page.
+2. Allow unknown app if prompted
+
 **Via USB (adb):**
 
 1. On the phone: *Settings ▸ About phone*, tap **Build number** 7 times, then enable **Developer options ▸ USB debugging**.
@@ -107,8 +124,6 @@ The APK is written to `app/build/outputs/apk/debug/app-debug.apk`.
 ```powershell
 adb install -r app\build\outputs\apk\debug\app-debug.apk
 ```
-
-**Or copy the file** to the phone and open it (allow "Install unknown apps" for your file manager/browser when asked).
 
 ### Android 13+ "Restricted setting" (sideloaded apps)
 
@@ -123,12 +138,12 @@ grant the SMS permission again. Installing with `adb install` normally avoids th
 3. Tap **Test connection** — you should receive "✅ SMSBridge test message" in Telegram and the status turns **Connected**.
 4. Tap **Start forwarding**. You're done; the app can be closed.
 5. Recommended: open **Battery settings** from the app and set SMSBridge to *Unrestricted* / not optimised
-   (see limitations below).
+(see limitations below).
 
 ## Troubleshooting
 
 | Symptom | What to check |
-|---|---|
+| --- | --- |
 | "Telegram rejected the bot token" | Token mistyped or revoked. Re-copy from @BotFather (`/mybots`). |
 | "Could not find or use this chat ID" | Wrong ID, or you haven't pressed **Start** on the bot. Groups use negative IDs. |
 | "The bot is not allowed to message this chat" (403) | You blocked the bot, or it was removed from the group. Unblock / re-add, then press Start. |
@@ -143,20 +158,20 @@ main screen.
 ## Known Android limitations
 
 - **Force-stop:** if you force-stop the app (or a "cleaner" app does), Android blocks all its receivers until you
-  open it again.
+open it again.
 - **Manufacturer battery managers** (Xiaomi, Oppo/Realme/OnePlus, Vivo, Huawei, Samsung "sleeping apps", etc.)
-  can kill or restrict background apps. Set SMSBridge to *Unrestricted*/*No restrictions*, enable *Autostart* where
-  your phone offers it, and lock the app in Recents. See [dontkillmyapp.com](https://dontkillmyapp.com).
+can kill or restrict background apps. Set SMSBridge to *Unrestricted*/*No restrictions*, enable *Autostart* where
+your phone offers it, and lock the app in Recents. See dontkillmyapp.com.
 - **Before first unlock:** after a reboot, SMS that arrive before you unlock the phone for the first time may not
-  be seen by the app (credential-encrypted storage is unavailable until then).
+be seen by the app (credential-encrypted storage is unavailable until then).
 - **Doze / no network:** retries run when Android's scheduler allows; very long offline periods mean delayed (not lost) delivery.
 - **Other SMS apps / RCS:** only classic SMS/MMS-text broadcasts are intercepted. RCS ("chat features") messages and
-  messages in other apps (WhatsApp etc.) are not SMS and can't be forwarded.
+messages in other apps (WhatsApp etc.) are not SMS and can't be forwarded.
 - **Dual SIM:** messages from both SIMs are forwarded; the SIM slot isn't included in the Telegram text.
 - **Google Play:** distributing an SMS-forwarding app on Google Play requires a policy exception; this project is intended for personal sideloading.
 - **Telegram limits:** about 1 message/second per chat; SMSBridge paces bulk deliveries accordingly.
 - **Duplicates:** a message is marked as sent only after Telegram confirms. If the connection drops after Telegram
-  received it but before the confirmation reached the phone, that one message could be sent twice rather than lost.
+received it but before the confirmation reached the phone, that one message could be sent twice rather than lost.
 
 ## Privacy & security
 
